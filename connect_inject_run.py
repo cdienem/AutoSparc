@@ -1,6 +1,6 @@
 #!/bin/python
 
-import pprint # oly for debugging
+import pprint # only for debugging
 from pymongo import MongoClient
 import random
 import datetime
@@ -17,6 +17,9 @@ Usage: python connect_inject_run.py [exp] [time]
 
 [exp] -> Experiment number from cryosparc that serves as a template (needs to be created in cryosparc before)
 [time] -> in minutes, the intervall of new job creation
+
+
+The script first reads the template experiment from the CryoSPARC database, changes a few fields (experiment number, name, date etc.) and re-inserts a new experiment with the same settings as the template. Then A new job for that experiment is created in the data base and is marked as "queued". Then Cryosparc will start the queued job autmatically. 
 
 Please note: This script does not have proper exception handling. In case of errors, funny things can happen in cryosparc ;-)
 
@@ -43,7 +46,15 @@ def get_next_id(exp_col, key):
 
 
 
+
+print "Starting AutoSparc"
+print "Using experiment #"+str(sys.argv[1])+" as template"
+print "Restarting a new Experiment every"+str(int(sys.argv[2])*60)+" minutes"
+
+
 while 1:
+	# Change server to the adress you need if the scriot does not run on the same machine
+	# The standard port is 38001, however, it may have been changed during your installation
 	client = MongoClient("localhost",38001)
 	# make a DB pointer
 	db = client.meteor
@@ -104,7 +115,7 @@ while 1:
 	    u'user_is_super_admin': False,
 	    u'user_name': {   u'first': u'Dim', u'last': u'Teg'}}
 	"""
-
+	# constructs the new job
 	new_job = {
 		"_id" : new_job_id,
 		"dataset_id" : orig["dataset_id"],
@@ -122,8 +133,10 @@ while 1:
 	}
 
 	#print new_job
-
+	# inserts the new job
 	res = sparc_jobs.insert_one(new_job)
+	
+	print str(datetime.datetime.utcnow())+": Started new experiment"
 
 	#print res
 	time.sleep(int(sys.argv[2])*60)
