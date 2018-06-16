@@ -12,17 +12,11 @@ import sys
 
 
 """ AutoSparc 
-
 Usage: python connect_inject_run.py [exp] [time]
-
 [exp] -> Experiment number from cryosparc that serves as a template (needs to be created in cryosparc before)
 [time] -> in minutes, the intervall of new job creation
-
-
 The script first reads the template experiment from the CryoSPARC database, changes a few fields (experiment number, name, date etc.) and re-inserts a new experiment with the same settings as the template. Then A new job for that experiment is created in the data base and is marked as "queued". Then Cryosparc will start the queued job autmatically. 
-
 Please note: This script does not have proper exception handling. In case of errors, funny things can happen in cryosparc ;-)
-
 """
 
 
@@ -49,7 +43,7 @@ def get_next_id(exp_col, key):
 
 print "Starting AutoSparc"
 print "Using experiment #"+str(sys.argv[1])+" as template"
-print "Restarting a new Experiment every"+str(int(sys.argv[2])*60)+" minutes"
+print "Restarting a new Experiment every "+str(sys.argv[2])+" minutes"
 
 
 while 1:
